@@ -1,10 +1,6 @@
 ﻿using FriendOrganizer.UI.Event;
 using Prism.Commands;
 using Prism.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -30,7 +26,7 @@ namespace FriendOrganizer.UI.ViewModel
         public ICommand DeleteCommand { get; set; }
         public bool HasChanges
         {
-            get { return _hasChanges; }
+            get => _hasChanges;
             set
             {
                 if (_hasChanges == value) return;
@@ -40,16 +36,12 @@ namespace FriendOrganizer.UI.ViewModel
             }
         }
 
-        protected virtual void RaiseDetailDeletedEvent(int modelId)
-        {
+        protected virtual void RaiseDetailDeletedEvent(int modelId) => 
             _eventAggregator.GetEvent<AfterDetailDeletedEvent>().Publish(
-                new AfterDetailDeletedEventArgs { Id = modelId, ViewModelName = this.GetType().Name});
-        }
+                new AfterDetailDeletedEventArgs { Id = modelId, ViewModelName = this.GetType().Name });
 
-        protected virtual void RaiseDetailSavedEvent(int modelId, string displayMember)
-        {
+        protected virtual void RaiseDetailSavedEvent(int modelId, string displayMember) => 
             _eventAggregator.GetEvent<AfterDetailSavedEvent>().Publish(
                 new AfterDetailSavedEventArgs { Id = modelId, DisplayMember = displayMember, ViewModelName = this.GetType().Name });
-        }
     }
 }

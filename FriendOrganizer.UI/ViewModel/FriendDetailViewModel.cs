@@ -1,6 +1,5 @@
 ﻿using FriendOrganizer.Model;
 using FriendOrganizer.UI.Data;
-using FriendOrganizer.UI.Event;
 using FriendOrganizer.UI.View.Services;
 using FriendOrganizer.UI.Wrapper;
 using Prism.Commands;
@@ -15,26 +14,21 @@ using FriendOrganizer.UI.Data.Lookup;
 
 namespace FriendOrganizer.UI.ViewModel
 {
-    public class FriendDetailViewModel : ViewModelBase, IFriendDetailViewModel
+    public class FriendDetailViewModel : DetailViewModelBase, IFriendDetailViewModel
     {
         private readonly IFriendRepository _repo;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IMessageDialogService _dialogService;
         private readonly IProgrammingLanguagesLookupDataService _programmingLanguagesLookupDataService;
         private FriendWrapper _friend;
-        private bool _hasChanges;
         private FriendPhoneNumberWrapper _selectedPhoneNumber;
         public FriendDetailViewModel(IFriendRepository repo,
             IEventAggregator eventAggregator,
             IMessageDialogService dialogService,
-            IProgrammingLanguagesLookupDataService programmingLanguagesLookupDataService)
+            IProgrammingLanguagesLookupDataService programmingLanguagesLookupDataService) : base(eventAggregator)
         {
             _repo = repo;
-            _eventAggregator = eventAggregator;
             _dialogService = dialogService;
             _programmingLanguagesLookupDataService = programmingLanguagesLookupDataService;
-            SaveCommand = new DelegateCommand(OnSaveExecute, OnSaveCanExecute);
-            DeleteCommand = new DelegateCommand(OnDeleteExecute);
             AddPhoneNumberCommand = new DelegateCommand(OnAddPhoneNumberExecute);
             RemovePhoneNumberCommand = new DelegateCommand(OnRemovePhoneNumberExecute, OnRemovePhoneNumberCanExecute);
         }
@@ -59,38 +53,26 @@ namespace FriendOrganizer.UI.ViewModel
             newNumber.Number = "";
         }
 
-        private void OnDeleteExecute()
+        protected override void OnDeleteExecute()
         {
             var result = _dialogService.ShowOkCancelDialog("Are you sure you want to delete this friend?", "Delete");
             if (result == MessageDialogresult.Cancel) return;
 
             _repo.Remove(Friend.Model);
             _repo.Save();
-            _eventAggregator.GetEvent<AfterDetailDeletedEvent>()
-                .Publish(
-                new AfterDetailDeletedEventArgs
-                {
-                    Id = Friend.Id,
-                    ViewModelName = nameof(FriendDetailViewModel)
-                });
+            RaiseDetailDeletedEvent(Friend.Id);
         }
 
-        private void OnSaveExecute()
+        protected override async void OnSaveExecute()
         {
-            _repo.Save();
+           await _repo.Save();
             HasChanges = _repo.HasChanges();
-            _eventAggregator.GetEvent<AfterDetailSavedEvent>()
-                .Publish(new AfterDetailSavedEventArgs
-                {
-                    Id = Friend.Id,
-                    DisplayMember = $"{Friend.FirstName} {Friend.LastName}",
-                    ViewModelName = nameof(FriendDetailViewModel)
-                });
+            RaiseDetailSavedEvent(Friend.Id, Friend.FirstName + " " + Friend.LastName);
         }
-        private bool OnSaveCanExecute() => Friend != null && !Friend.HasErrors && HasChanges && PhoneNumbers.All(x => !x.HasErrors);
-        public async Task LoadAsync(int? friendId)
+        protected override bool OnSaveCanExecute() => Friend != null && !Friend.HasErrors && HasChanges && PhoneNumbers.All(x => !x.HasErrors);
+        public override async Task LoadAsync(int? friendId)
         {
-            var friend = friendId.HasValue ? await _repo.GetFriendById(friendId.Value) : CreateNewFriend();
+            var friend = friendId.HasValue ? await _repo.GetByIdAsync(friendId.Value) : CreateNewFriend();
             InitializeFriend(friend);
             InitializeFriendPhoneNumbers(friend.PhoneNumbers);
             await LoadProgrammingLanguages();
@@ -150,8 +132,6 @@ namespace FriendOrganizer.UI.ViewModel
             return friend;
         }
 
-
-
         public FriendWrapper Friend
         {
             get => _friend;
@@ -159,21 +139,6 @@ namespace FriendOrganizer.UI.ViewModel
             {
                 _friend = value;
                 OnPropertyChanged();
-            }
-        }
-
-
-        public bool HasChanges
-        {
-            get { return _hasChanges; }
-            set
-            {
-                if (_hasChanges != value)
-                {
-                    _hasChanges = value;
-                    OnPropertyChanged();
-                    ((DelegateCommand)SaveCommand).RaiseCanExecuteChanged();
-                }
             }
         }
 
@@ -190,8 +155,6 @@ namespace FriendOrganizer.UI.ViewModel
 
         public ObservableCollection<LookupItem> ProgrammingLanguages { get; set; } = new ObservableCollection<LookupItem>();
         public ObservableCollection<FriendPhoneNumberWrapper> PhoneNumbers { get; set; } = new ObservableCollection<FriendPhoneNumberWrapper>();
-        public ICommand SaveCommand { get; set; }
-        public ICommand DeleteCommand { get; set; }
         public ICommand AddPhoneNumberCommand { get; set; }
         public ICommand RemovePhoneNumberCommand { get; set; }
 

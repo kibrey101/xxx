@@ -1,18 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using FriendOrganizer.Model;
 using FriendOrganizer.UI.Wrapper;
 
 namespace FriendOrganizer.UI.Data
 {
-    public interface IFriendRepository
-    {
-        Task<Friend> GetFriendById(int id);
-        void Save();
-        bool HasChanges();
-        void Add(Friend friend);
-        void Remove(Friend model);
-        Task<IEnumerable<ProgrammingLanguage>> GetProgrammingLanguagesAsync();
+    public interface IFriendRepository : IGenericRepository<Friend>
+    {        
         void RemovePhoneNumber(FriendPhoneNumber model);
     }
 }

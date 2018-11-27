@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BDEAEE38-1FCD-4892-9B30-FD5EEA3CA773}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FriendOrganizer.DataAccess</RootNamespace>
+    <AssemblyName>FriendOrganizer.DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="FriendOrganizerDbContext.cs" />
+    <Compile Include="Migrations\201811102037590_InitialDatabase.cs" />
+    <Compile Include="Migrations\201811102037590_InitialDatabase.Designer.cs">
+      <DependentUpon>201811102037590_InitialDatabase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811110514083_remreq.cs" />
+    <Compile Include="Migrations\201811110514083_remreq.Designer.cs">
+      <DependentUpon>201811110514083_remreq.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811110515255_remreq1.cs" />
+    <Compile Include="Migrations\201811110515255_remreq1.Designer.cs">
+      <DependentUpon>201811110515255_remreq1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811170543555_AddedProgrammingLanguage.cs" />
+    <Compile Include="Migrations\201811170543555_AddedProgrammingLanguage.Designer.cs">
+      <DependentUpon>201811170543555_AddedProgrammingLanguage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811170623479_AddedNullProgrammingLanguage.cs" />
+    <Compile Include="Migrations\201811170623479_AddedNullProgrammingLanguage.Designer.cs">
+      <DependentUpon>201811170623479_AddedNullProgrammingLanguage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811181624538_AddedFriendPhoneNumbers.cs" />
+    <Compile Include="Migrations\201811181624538_AddedFriendPhoneNumbers.Designer.cs">
+      <DependentUpon>201811181624538_AddedFriendPhoneNumbers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811270512194_updatedProgrammingLangaugesEntity.cs" />
+    <Compile Include="Migrations\201811270512194_updatedProgrammingLangaugesEntity.Designer.cs">
+      <DependentUpon>201811270512194_updatedProgrammingLangaugesEntity.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FriendOrganizer.Model\FriendOrganizer.Model.csproj">
+      <Project>{e7eb6352-3396-4ce1-b261-d84efc24009c}</Project>
+      <Name>FriendOrganizer.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201811102037590_InitialDatabase.resx">
+      <DependentUpon>201811102037590_InitialDatabase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811110514083_remreq.resx">
+      <DependentUpon>201811110514083_remreq.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811110515255_remreq1.resx">
+      <DependentUpon>201811110515255_remreq1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811170543555_AddedProgrammingLanguage.resx">
+      <DependentUpon>201811170543555_AddedProgrammingLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811170623479_AddedNullProgrammingLanguage.resx">
+      <DependentUpon>201811170623479_AddedNullProgrammingLanguage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811181624538_AddedFriendPhoneNumbers.resx">
+      <DependentUpon>201811181624538_AddedFriendPhoneNumbers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811270512194_updatedProgrammingLangaugesEntity.resx">
+      <DependentUpon>201811270512194_updatedProgrammingLangaugesEntity.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

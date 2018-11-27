@@ -18,5 +18,6 @@ namespace FriendOrganizer.Model
         public int? ProgrammingLanguageId { get; set; }
         public ProgrammingLanguage ProgrammingLanguage { get; set; }
         public ICollection<FriendPhoneNumber> PhoneNumbers { get; set; } = new Collection<FriendPhoneNumber>();
+        public ICollection<Meeting> Meetings { get; set; } = new List<Meeting>();
     }
 }

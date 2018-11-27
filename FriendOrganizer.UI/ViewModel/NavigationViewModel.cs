@@ -5,16 +5,20 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using FriendOrganizer.UI.Data.Lookup;
+using System;
 
 namespace FriendOrganizer.UI.ViewModel
 {
     public class NavigationViewModel : ViewModelBase, INavigationViewModel
     {
-        private readonly IFriendLookupDataService _lookupDataService;
+        private readonly IFriendLookupDataService _friendLookupDataService;
+        private readonly IMeetingLookupDataService _meetingLookupDataService;
         private readonly IEventAggregator _eventAggregator;
-        public NavigationViewModel(IFriendLookupDataService lookupDataService, IEventAggregator eventAggregator)
+        public NavigationViewModel(IFriendLookupDataService friendLookupDataService,
+            IMeetingLookupDataService meetingLookupDataService, IEventAggregator eventAggregator)
         {
-            _lookupDataService = lookupDataService;
+            _friendLookupDataService = friendLookupDataService;
+            _meetingLookupDataService = meetingLookupDataService;
             _eventAggregator = eventAggregator;
             _eventAggregator.GetEvent<AfterDetailSavedEvent>().Subscribe(OnAfterDetailSaved);
             _eventAggregator.GetEvent<AfterDetailDeletedEvent>().Subscribe(OnAfterDetailDeleted);
@@ -25,12 +29,21 @@ namespace FriendOrganizer.UI.ViewModel
             switch (args.ViewModelName)
             {
                 case nameof(FriendDetailViewModel):
-                    var deletedFriend = Friends.FirstOrDefault(f => f.Id == args.Id);
-                    if (deletedFriend == null) return;
+                    AfterDetailDeleted(Friends, args);
+                    break;
 
-                    Friends.Remove(deletedFriend);
+                case nameof(MeetingDetailViewModel):
+                    AfterDetailDeleted(Meetings, args);
                     break;
             }
+        }
+
+        private void AfterDetailDeleted(ObservableCollection<NavigationItemViewModel> items, AfterDetailDeletedEventArgs args)
+        {
+            var deletedItem = items.FirstOrDefault(f => f.Id == args.Id);
+            if (deletedItem == null) return;
+
+            items.Remove(deletedItem);
         }
 
         private void OnAfterDetailSaved(AfterDetailSavedEventArgs args)
@@ -38,24 +51,40 @@ namespace FriendOrganizer.UI.ViewModel
             switch (args.ViewModelName)
             {
                 case nameof(FriendDetailViewModel):
-                    var friend = Friends.SingleOrDefault(f => f.Id == args.Id);
-                    if (friend == null)
-                        Friends.Add(new NavigationItemViewModel(args.Id, args.DisplayMember, nameof(FriendDetailViewModel), _eventAggregator));
-                    else
-                        friend.DisplayMember = args.DisplayMember;
+                    AfterDetailSaved(Friends, args);
+                    break;
+
+                case nameof(MeetingDetailViewModel):
+                    AfterDetailSaved(Meetings, args);
                     break;
             }
             
         }
 
-        public ObservableCollection<NavigationItemViewModel> Friends { get; set; } = new ObservableCollection<NavigationItemViewModel>();
+        private void AfterDetailSaved(ObservableCollection<NavigationItemViewModel> items, AfterDetailSavedEventArgs args)
+        {
+            var item = items.SingleOrDefault(f => f.Id == args.Id);
+            if (item == null)
+                items.Add(new NavigationItemViewModel(args.Id, args.DisplayMember, args.ViewModelName, _eventAggregator));
+            else
+                item.DisplayMember = args.DisplayMember;
+        }
 
+        public ObservableCollection<NavigationItemViewModel> Friends { get; set; } = new ObservableCollection<NavigationItemViewModel>();
+        public ObservableCollection<NavigationItemViewModel> Meetings { get; set; } = new ObservableCollection<NavigationItemViewModel>();
         public async Task LoadAsync()
         {
-            var friends = await _lookupDataService.GetFriendsLookup();
+            var friends = await _friendLookupDataService.GetFriendsLookup();
+            Friends.Clear();
 
             foreach (var friend in friends)
                 Friends.Add(new NavigationItemViewModel(friend.Id, friend.DisplayMember, nameof(FriendDetailViewModel), _eventAggregator));
+
+            var meetings = await _meetingLookupDataService.GetMeetingsLookup();
+            Meetings.Clear();
+
+            foreach (var meeting in meetings)
+                Meetings.Add(new NavigationItemViewModel(meeting.Id, meeting.DisplayMember, nameof(MeetingDetailViewModel), _eventAggregator));
         }
 
     }

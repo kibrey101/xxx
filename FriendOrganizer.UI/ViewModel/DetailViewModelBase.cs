@@ -38,10 +38,10 @@ namespace FriendOrganizer.UI.ViewModel
 
         protected virtual void RaiseDetailDeletedEvent(int modelId) => 
             _eventAggregator.GetEvent<AfterDetailDeletedEvent>().Publish(
-                new AfterDetailDeletedEventArgs { Id = modelId, ViewModelName = this.GetType().Name });
+                new AfterDetailDeletedEventArgs { Id = modelId, ViewModelName = GetType().Name });
 
         protected virtual void RaiseDetailSavedEvent(int modelId, string displayMember) => 
             _eventAggregator.GetEvent<AfterDetailSavedEvent>().Publish(
-                new AfterDetailSavedEventArgs { Id = modelId, DisplayMember = displayMember, ViewModelName = this.GetType().Name });
+                new AfterDetailSavedEventArgs { Id = modelId, DisplayMember = displayMember, ViewModelName = GetType().Name });
     }
 }

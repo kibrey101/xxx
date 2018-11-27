@@ -12,10 +12,7 @@ namespace FriendOrganizer.UI.Wrapper
         {
         }
 
-        public int Id {
-            get => GetValue<int>();
-            private set => SetValue(value);
-        }
+        public int Id => Model.Id;
         public string FirstName
         {
             get => GetValue<string>();

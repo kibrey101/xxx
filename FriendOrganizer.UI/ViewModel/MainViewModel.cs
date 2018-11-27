@@ -5,25 +5,23 @@ using Prism.Events;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Autofac.Features.Indexed;
 
 namespace FriendOrganizer.UI.ViewModel
 {
     public class MainViewModel : ViewModelBase
     {
         private readonly IEventAggregator _eventAggregator;
-        private readonly Func<IFriendDetailViewModel> _friendDetailViewModelCreator;
-        private readonly Func<IMeetingDetailViewModel> _meetingDetailViewModelCreator;
         private readonly IMessageDialogService _dialogService;
         private IDetailViewModel _detailViewModel;
+        private readonly IIndex<string, IDetailViewModel> _detailViewModelCreator;
         public MainViewModel(INavigationViewModel navigationViewModel,
-            Func<IFriendDetailViewModel> friendDetailViewModelCreator,
-            Func<IMeetingDetailViewModel> meetingDetailViewModelCreator,
+            IIndex<string, IDetailViewModel> detailViewModelCreator,           
             IEventAggregator eventAggregator, IMessageDialogService dialogService)
         {
             _eventAggregator = eventAggregator;
             NavigationViewModel = navigationViewModel;
-            _friendDetailViewModelCreator = friendDetailViewModelCreator;
-            _meetingDetailViewModelCreator = meetingDetailViewModelCreator;
+            _detailViewModelCreator = detailViewModelCreator;
             _eventAggregator.GetEvent<OpenDetailViewEvent>().Subscribe(OnOpenDetailView);
             _dialogService = dialogService;
             CreateNewDetailCommand = new DelegateCommand<Type>(OnCreateNewDetailExecute);
@@ -51,18 +49,8 @@ namespace FriendOrganizer.UI.ViewModel
                 var result = _dialogService.ShowOkCancelDialog("You have made changes", "Navigate away?");
                 if (result == MessageDialogresult.Cancel) return;
             }
-            switch (args.ViewModelName)
-            {
-                case nameof(FriendDetailViewModel):
-                    DetailViewModel = _friendDetailViewModelCreator();
-                    break;
-                case nameof(MeetingDetailViewModel):
-                    DetailViewModel = _meetingDetailViewModelCreator();
-                    break;
-                default:
-                    throw new Exception($"ViewModel {args.ViewModelName} not mapped");
-            }
 
+            DetailViewModel = _detailViewModelCreator[args.ViewModelName];
             await DetailViewModel.LoadAsync(args.Id);
         }
         private void OnCreateNewDetailExecute(Type viewModelType) => OnOpenDetailView(new OpenDetailViewEventArgs {ViewModelName = viewModelType.Name});
